@@ -44,15 +44,13 @@ public class ListaDoblementeEnlazada<T extends Comparable<T>> implements Iterabl
             }
             tamaño--;
 
-            System.out.println("Tamaño de la lista actualizado: " + tamaño);
+            System.out.println("Tamaño de la lista  actualizado: " + tamaño);
             System.out.println("_____________________________________________");
         } else {
             System.out.println("La lista está vacía. No se puede eliminar el último elemento.");
         }
     }
-
-    // Agregar nodo al principio de la lista
-    public void agregarAlInicio(T dato) {
+public void agregarAlInicio(T dato) {
         Nodo<T> nuevoNodo = new Nodo<>(dato);
         if (estaVacia()) {
             cabeza = nuevoNodo;
@@ -63,9 +61,9 @@ public class ListaDoblementeEnlazada<T extends Comparable<T>> implements Iterabl
             cabeza = nuevoNodo;
         }
         tamaño++;
+        ordenar();
     }
 
-    // Agregar nodo al final de la lista
     public void agregarAlFinal(T dato) {
         Nodo<T> nuevoNodo = new Nodo<>(dato);
         if (estaVacia()) {
@@ -77,6 +75,7 @@ public class ListaDoblementeEnlazada<T extends Comparable<T>> implements Iterabl
             cola = nuevoNodo;
         }
         tamaño++;
+        ordenar();
     }
 
     public void agregarEnMedio(T dato) {
@@ -86,35 +85,53 @@ public class ListaDoblementeEnlazada<T extends Comparable<T>> implements Iterabl
             cabeza = nuevoNodo;
             cola = nuevoNodo;
         } else {
-            // Calcula la posición media
-            int posicionMedia = tamaño / 2;
-
-            if (tamaño % 2 == 0) {
-                // Si la lista tiene un número par de elementos, ajusta la posición media
-                posicionMedia--;
-            }
-
             Nodo<T> actual = cabeza;
-            int contador = 0;
+            Nodo<T> anterior = null;
 
-            while (contador < posicionMedia) {
+            while (actual != null && actual.dato.compareTo(dato) < 0) {
+                anterior = actual;
                 actual = actual.siguiente;
-                contador++;
             }
 
-            nuevoNodo.siguiente = actual.siguiente;
-            nuevoNodo.anterior = actual;
-            if (actual.siguiente != null) {
-                actual.siguiente.anterior = nuevoNodo;
-            }
-            actual.siguiente = nuevoNodo;
-
-            if (contador == posicionMedia && actual == cola) {
+            if (anterior == null) {
+                // El nuevo nodo se insertará al principio de la lista
+                nuevoNodo.siguiente = cabeza;
+                cabeza.anterior = nuevoNodo;
+                cabeza = nuevoNodo;
+            } else if (actual == null) {
+                // El nuevo nodo se insertará al final de la lista
+                anterior.siguiente = nuevoNodo;
+                nuevoNodo.anterior = anterior;
                 cola = nuevoNodo;
+            } else {
+                // El nuevo nodo se insertará en medio de la lista
+                nuevoNodo.siguiente = actual;
+                nuevoNodo.anterior = anterior;
+                actual.anterior = nuevoNodo;
+                anterior.siguiente = nuevoNodo;
             }
         }
         tamaño++;
     }
+
+    private void ordenar() {
+        if (tamaño > 1) {
+            Nodo<T> current = cabeza;
+            while (current.siguiente != null) {
+                Nodo<T> next = current.siguiente;
+                if (current.dato.compareTo(next.dato) > 0) {
+                    // Swap the data
+                    T temp = current.dato;
+                    current.dato = next.dato;
+                    next.dato = temp;
+                    current = cabeza; // Start over after swapping
+                } else {
+                    current = current.siguiente;
+                }
+            }
+        }
+    }
+    
 
     // Verificar si la lista está vacía
     public boolean estaVacia() {
